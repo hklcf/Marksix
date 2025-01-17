@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marksix</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: "Microsoft JhengHei", Arial, sans-serif;
+            background-color: #f0f2f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .control-panel {
+            margin-bottom: 20px;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .numbers-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+            min-height: 80px;
+        }
+
+        .ball {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            border: 2px solid;
+            animation: popIn 0.3s ease-out;
+        }
+
+        .ball.red { color: #e74c3c; border-color: #e74c3c; }
+        .ball.green { color: #27ae60; border-color: #27ae60; }
+        .ball.blue { color: #3498db; border-color: #3498db; }
+
+        @keyframes popIn {
+            0% { transform: scale(0); }
+            70% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        @media (max-width: 480px) {
+            .ball {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Marksix</h1>
+        <div class="control-panel">
+            <select id="colorSelect">
+                <option value="all">全部號碼</option>
+                <option value="red">紅色號碼</option>
+                <option value="green">綠色號碼</option>
+                <option value="blue">藍色號碼</option>
+                <option value="wored">不含紅色</option>
+                <option value="wogreen">不含綠色</option>
+                <option value="woblue">不含藍色</option>
+            </select>
+            <button onclick="generateNumbers()">產生號碼</button>
+        </div>
+        <div id="numbersContainer" class="numbers-container"></div>
+    </div>
+    <div style="text-align: center; margin-top: 20px; color: #666; font-size: 14px;">
+        © eService-HK
+    </div>
+
+    <script>
+        // 定義號碼池
+        const numberPool = {
+            all: Array.from({length: 49}, (_, i) => i + 1),
+            red: [1, 2, 7, 8, 12, 13, 18, 19, 23, 24, 29, 30, 34, 35, 40, 45, 46],
+            green: [5, 6, 11, 16, 17, 21, 22, 27, 28, 32, 33, 38, 39, 43, 44, 49],
+            blue: [3, 4, 9, 10, 14, 15, 20, 25, 26, 31, 36, 37, 41, 42, 47, 48]
+        };
+
+        // 初始化其他號碼池
+        numberPool.wored = numberPool.all.filter(n => !numberPool.red.includes(n));
+        numberPool.wogreen = numberPool.all.filter(n => !numberPool.green.includes(n));
+        numberPool.woblue = numberPool.all.filter(n => !numberPool.blue.includes(n));
+
+        function getNumberColor(number) {
+            if (numberPool.red.includes(number)) return 'red';
+            if (numberPool.green.includes(number)) return 'green';
+            if (numberPool.blue.includes(number)) return 'blue';
+            return '';
+        }
+
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
+        function generateNumbers() {
+            const selectedColor = document.getElementById('colorSelect').value;
+            const availableNumbers = [...numberPool[selectedColor]];
+            const selectedNumbers = shuffleArray(availableNumbers).slice(0, 6);
+
+            const container = document.getElementById('numbersContainer');
+            container.innerHTML = '';
+            
+            selectedNumbers.forEach(number => {
+                const ball = document.createElement('div');
+                ball.className = `ball ${getNumberColor(number)}`;
+                ball.textContent = number;
+                container.appendChild(ball);
+            });
+        }
+    </script>
+</body>
+</html>
